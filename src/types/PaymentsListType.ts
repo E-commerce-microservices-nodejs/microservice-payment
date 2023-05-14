@@ -1,4 +1,4 @@
-import Payment from "./Payment";
+import Payment from "./PaymentType";
 
 interface PaymentsList {
   products: Payment[];

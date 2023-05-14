@@ -1,8 +1,10 @@
 import { Document } from 'mongoose';
 
 interface Payment extends Document {
-  idCommande: number;
-  montant: number;
-  numeroCarte: number;
+  orderId:number;
+  amount: number;
+  cardNumber: number;
+
+
 }
 export default Payment
