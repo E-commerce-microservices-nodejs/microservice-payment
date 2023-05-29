@@ -1,11 +1,8 @@
-# Base Node.js image
-FROM node:16.20-bullseye-slim
+# Stage 1: Build the application
+FROM node:16.20-bullseye-slim AS build
 
-# Set environment variables for production
-ENV NODE_ENV=production
-ENV MONGO_URI=mongodb://mongodb-container/microservices
-ENV PORT=5003
-
+# Set environment variables
+ENV NODE_ENV=development
 
 # Set the working directory
 WORKDIR /app
@@ -13,16 +10,28 @@ WORKDIR /app
 # Copy package.json and package-lock.json to install dependencies
 COPY package*.json ./
 
-# Install production dependencies only (for security)
-RUN npm ci --only=production && \
-    npm cache clean --force
+RUN npm install
 
-# Copy the rest of the source code
+# Copy the source code and build the application
 COPY . .
+RUN npm run build
 
-# Create the build directory and set appropriate permissions
-RUN mkdir -p /app/build && \
-    chown -R node:node /app/build
+# Stage 2: Create the production image
+FROM node:16.20-bullseye-slim
+
+# Set environment variables
+ENV NODE_ENV=production
+ENV PORT=5003
+
+# Set the working directory
+WORKDIR /app
+
+# Copy the build artifacts from the previous stage
+COPY --from=build /app/build ./build
+
+# Install only production dependencies
+COPY package*.json ./
+RUN npm ci --only=production
 
 # Expose the port on which the application listens
 EXPOSE 5003
@@ -31,10 +40,4 @@ EXPOSE 5003
 USER node
 
 # Start the application
-CMD ["npm","run" ,"start:prod"]
-
-# Specify the microservice-specific labels
-LABEL version="1.0" description="Payment microservice"
-
-
-
+CMD ["node", "build/server.js"]

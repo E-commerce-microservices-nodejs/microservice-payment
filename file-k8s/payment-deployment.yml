@@ -1,0 +1,45 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+ name: mongodb-conf
+ namespace: m-ecommerce
+data:
+ host: mongodb-service
+ port: "27017"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payment-deployment
+  namespace: m-ecommerce
+spec:
+  selector:
+    matchLabels:
+      app: payment-deployment
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: payment-deployment
+    spec:
+      containers:
+        - name: payment-deployment
+          image: asmaeel/payment-microservice:1.5
+          ports:
+            - containerPort: 5003
+              name: payment-port
+          env:
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: mongodb-conf
+                  key: host
+            - name: DB_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: mongodb-conf
+                  key: port
+            - name: MONGO_URI
+              value: "mongodb://mongodb-service/microservices"
+            - name: ORDERS_SERVER
+              value: "http://order-service:5002/api"

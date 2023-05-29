@@ -1,32 +1,33 @@
 import express, {  Request, Response } from "express";
 import Payment from "../../models/paymentModel";
-import { Error } from "mongoose";
 import axios from 'axios'
+import dotenv from 'dotenv';
+
 
 const router = express.Router();
-
-const ordersServiceUrl="http://localhost:5002"
+dotenv.config();
+const ordersServiceUrl=`${process.env.ORDERS_SERVER}`;
 
 router.post("/", async (req: Request, res: Response) => {
-  try {
-    const paymentExisted = await Payment.find({ orderId: req.body.orderId });
-    if (paymentExisted[0]) {
-      return res.json({ message: "Order is already paid" }).end();
-    }
-    const newPayment = new Payment({
-      ...req.body,
-    });
-    if (!newPayment) {
-      throw new Error("Payment failed");
-    }
-    await newPayment.save();
-    // mark order as paid order
-    await axios.put(`${ordersServiceUrl}/orders/${req.body.orderId}`);
 
-    return res.json(newPayment).end();
-  } catch (error:any) {
-      return res.status(500).json({ message: "Internal server error" }).end();
+  try {
+    // Process the payment logic using the payment details from req.body
+    // const paymentResult = await processPayment(req.body);
+  const  { orderId,amount,cardNumber}=req.body
+    const newPayment = new Payment({
+      orderId,amount,cardNumber
+    })
+    // If payment is successful, mark the order as paid
+    // if (newPayment) {
+      await axios.put(`${ordersServiceUrl}/orders/${req.body.orderId}`);
+    // }
+    // Send the payment result back to the gateway
+    res.json(newPayment);
+  } catch (error) {
+    // Handle errors and send an appropriate response
+    res.status(500).json({ error: 'Failed to process payment' });
   }
+
 });
 
 // export = router;
