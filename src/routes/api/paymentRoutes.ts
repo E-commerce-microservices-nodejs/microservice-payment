@@ -1,11 +1,12 @@
 import express, {  Request, Response } from "express";
 import Payment from "../../models/paymentModel";
-import { Error } from "mongoose";
 import axios from 'axios'
+import dotenv from 'dotenv';
+
 
 const router = express.Router();
-
-const ordersServiceUrl="http://localhost:5002/api"
+dotenv.config();
+const ordersServiceUrl=`${process.env.ORDERS_SERVER}`;
 
 router.post("/", async (req: Request, res: Response) => {
 
@@ -27,33 +28,6 @@ router.post("/", async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Failed to process payment' });
   }
 
-
-
-
-  // try {
-    // const paymentExisted = await Payment.find({ orderId: req.body.orderId });
-    // if (paymentExisted) {
-    //   return res.json({ message: "Order is already paid" }).end();
-    // }
-  //   const  { orderId,amount,cardNumber}=req.body
-  //   const newPayment = new Payment({
-  //     orderId,amount,cardNumber
-  //   }
-    
-  //   );
-  //   // if (!newPayment) {
-  //   //   throw new Error("Payment failed");
-  //   // }
-  //   await newPayment.save();
-  //   // mark order as paid order
-  //   console.log("before order payed")
-  //   await axios.put(`${ordersServiceUrl}/api/orders/${req.body.orderId}`,req.body).then(()=>console.log("order payed"));
-      
-  //   return res.json(newPayment);
-  // } catch (error:any) {
-  //   console.log("error in payment")
-  //     return res.status(500).json({ message: "Internal server error" }).end();
-  // }
 });
 
 // export = router;
