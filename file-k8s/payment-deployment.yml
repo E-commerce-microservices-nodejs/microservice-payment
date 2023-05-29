@@ -24,7 +24,7 @@ spec:
     spec:
       containers:
         - name: payment-deployment
-          image: asmaeel/payment-microservice:1.5
+          image: asmaeel/payment-microservice:1.1
           ports:
             - containerPort: 5003
               name: payment-port
