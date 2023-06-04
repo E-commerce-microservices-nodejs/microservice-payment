@@ -7,9 +7,9 @@ interface PaymentModel extends Model<PaymentDocument> {}
 interface PaymentDocument extends Payment {}
 
 const paymentSchema = new Schema<PaymentDocument, PaymentModel>({
-  orderId: { type: Number, unique: true },
+  orderId: { type: String, unique: true },
   amount: { type: Number, required: true },
-  cardNumber: { type: Number },
+  cardNumber: { type: String },
 });
 
 const Payment = model<PaymentDocument, PaymentModel>('Payment', paymentSchema);
