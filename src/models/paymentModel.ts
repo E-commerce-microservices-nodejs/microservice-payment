@@ -1,17 +1,21 @@
+import { Schema, model, Document } from 'mongoose';
 
-import { Schema, model, Model, Document } from 'mongoose';
-import Payment from '../types/PaymentType';
+interface Payment {
+  _id?: string;
+  orderId: string;
+  amount: number;
+  cardNumber: string;
+}
+interface PaymentDocument extends Document, Payment {
+  _id: string;
+}
 
-interface PaymentModel extends Model<PaymentDocument> {}
-
-interface PaymentDocument extends Payment {}
-
-const paymentSchema = new Schema<PaymentDocument, PaymentModel>({
-  orderId: { type: Number, unique: true },
+const paymentSchema = new Schema<PaymentDocument>({
+  orderId: { type: String, unique: true },
   amount: { type: Number, required: true },
-  cardNumber: { type: Number },
+  cardNumber: { type: String },
 });
 
-const Payment = model<PaymentDocument, PaymentModel>('Payment', paymentSchema);
+const Payment = model<PaymentDocument>('Payment', paymentSchema);
 
 export default Payment;
